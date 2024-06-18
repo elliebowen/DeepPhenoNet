@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Phenotype Search</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.min.js"></script>
+    <script>
+        async function loadCSV(url) {
+            const response = await fetch(url);
+            if (!response.ok) {
+                console.error('Failed to load CSV:', url);
+                return [];
+            }
+            const text = await response.text();
+            const rows = text.split('\n').map(row => row.split(','));
+            return rows;
+        }
+
+        function normalize(str) {
+            return str.trim().toLowerCase();
+        }
+
+        function findPhenotype(phenotypes, query) {
+            const options = {
+                includeScore: true,
+                threshold: 0.3,
+                keys: ['phenotype']
+            };
+            const fuse = new Fuse(phenotypes.map(p => ({ phenotype: p })), options);
+            const result = fuse.search(query);
+            return result.length > 0 ? result[0].item.phenotype : null;
+        }
+
+        async function searchPhenotypes() {
+            const query = normalize(document.getElementById('query').value);
+            const topN = parseInt(document.getElementById('top_n').value);
+
+            const similarityData = await loadCSV('similarity_matrix_with_phenotypes.csv');
+            if (similarityData.length === 0) {
+                alert('Failed to load similarity data.');
+                return;
+            }
+
+            // Extract and normalize phenotype names
+            const phenotypes = similarityData.slice(1).map(row => {
+                if (row.length === 0) return null;
+                return normalize(row[0]);
+            }).filter(Boolean);
+
+            const foundPhenotype = findPhenotype(phenotypes, query);
+            if (!foundPhenotype) {
+                alert('Phenotype not found');
+                return;
+            }
+
+            const queryIndex = phenotypes.indexOf(foundPhenotype);
+            if (queryIndex === -1) {
+                alert('Phenotype not found in data.');
+                return;
+            }
+
+            const scores = similarityData[queryIndex + 1].slice(1).map(score => parseFloat(score));
+
+            const results = similarityData[0].slice(1).map((phenotype, index) => {
+                if (similarityData[index + 1] && similarityData[index + 1][0]) {
+                    return {
+                        phenotype: similarityData[index + 1][0], // Ensure correct phenotype label
+                        score: scores[index]
+                    };
+                } else {
+                    return null;
+                }
+            }).filter(Boolean);
+            results.sort((a, b) => b.score - a.score);
+
+            const topResults = results.slice(0, topN);
+
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `<h2>Results for <b>${similarityData[queryIndex + 1][0]}</b>:</h2>`;
+            topResults.forEach(result => {
+                resultsDiv.innerHTML += `<p>${result.phenotype} (score: ${result.score.toFixed(6)})</p>`;
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Search Phenotypes</h1>
+    <form onsubmit="event.preventDefault(); searchPhenotypes();">
+        <label for="query">Type in a phenotype:</label>
+        <input type="text" id="query" required>
+        <label for="top_n">Number of results:</label>
+        <input type="number" id="top_n" value="5" required>
+        <button type="submit">Search</button>
+    </form>
+    <div id="results"></div>
+</body>
+</html>
