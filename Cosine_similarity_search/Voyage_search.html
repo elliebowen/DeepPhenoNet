@@ -34,7 +34,7 @@
             const query = normalize(document.getElementById('query').value);
             const topN = parseInt(document.getElementById('top_n').value);
 
-            const similarityData = await loadCSV('similarity_matrix_with_phenotypes_mistral.csv');
+            const similarityData = await loadCSV('similarity_matrix_with_phenotypes_voyage.csv');
             if (similarityData.length === 0) {
                 alert('Failed to load similarity data.');
                 return;
