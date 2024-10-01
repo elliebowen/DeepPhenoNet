@@ -17,5 +17,12 @@ Then you should be able to open your browser and type in the local file to acces
 - OpenAI embeddings cosine-similarity search: http://localhost:8000/Openai_search.html
 - Voyage embeddings cosine-similarity search: http://localhost:8000/Voyage_search.html
 
+ And for phecodes + the following additional mendelian diseases:  Nocturnal frontal lobe epilepsy 1, Nephrotic syndrome type 7, Sulfocysteinuria, Charcotte Marie Tooth Disease 2A, Spastic Paraplegia 30, Factor X deficiency, Hemochromatosis, Thyroid dyshormonogenesis, Familial erythrocytosis 1, Spinocerebellar ataxia, Interstitial nephritis karyomegalic, HARP syndrome, Essential thrombocythemia, Primary hyperoxaluria type 1, Familial cold autoinflammatory syndrome 3, Fabrys Disease
+
+use these files:
+- Mistral: http://localhost:8000/Mistral_phecodes_with_mendelian_dx_search.html
+- OpenAI: http://localhost:8000/Openai_phecodes_with_mendelian_dx_search.html
+- Voyage: http://localhost:8000/Voyage_phecodes_with_mendelian_dx_search.html
+
 
 Please email ellbowen@med.umich.edu with any questions
